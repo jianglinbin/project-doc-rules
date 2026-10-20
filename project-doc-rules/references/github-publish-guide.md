@@ -36,16 +36,17 @@ python tools/github_publish.py publish --private --tags --watch   # 全流程一
 
 1. **先提交再推送**：脚本遇脏工作区直接拒绝——这是把 AGENTS.md「先提交本地库，再推送」
    的顺序铁律做成了机器门槛，不要用 `--allow-dirty` 绕过。
-2. **开发侧工具文件不上公开仓**（沿 d372 决议）：`.gitignore` / `.clang-format` /
-   `.gitattributes` 只留本地。`.gitignore` 的自排除做法：把 `.gitignore` 一行写进
-   `.gitignore` 本身（忽略规则对未跟踪文件依然生效），再 `git rm --cached .gitignore`
-   移出索引并提交。脚本 push 时发现它被跟踪会给出提示。
+2. **开发侧文件不上公开仓**（沿 d372 决议）：`.gitignore` / `.clang-format` /
+   `.gitattributes`，以及**规则层与台账（`AGENTS.md`、`ledger/`）**——它们是开发过程
+   产物，公开仓只放对外交付物。`.gitignore` 的自排除做法：把 `.gitignore` 一行写进
+   `.gitignore` 本身（忽略规则对未跟踪文件依然生效），再 `git rm --cached` 移出索引
+   （ledger 加 `-r`）并提交。脚本 push 时发现这些文件被跟踪会给出提示。
 3. **token 不进 git config**：脚本用一次性 URL 推送；若项目原本没有 origin，
    推完会补一个无凭据的 origin 供日常 fetch/pull。
-3. **CI 触发两型**：`workflow_dispatch` 型用 `ci trigger`；`push tags` 型用 `push --tags`。
+4. **CI 触发两型**：`workflow_dispatch` 型用 `ci trigger`；`push tags` 型用 `push --tags`。
    本地只有一个 workflow 文件时 `publish` 子命令会自动识别并等待结论。
-4. **目标仓库记忆**：`repo create` / 成功推送后把 `owner/name` 记在配置目录
-   （repo.json），后续命令不必重复指定。
+5. **目标仓库记忆**：`repo create` / 成功推送后把 `owner/name` 记在配置目录
+   （repo.json），后续命令不必重复指定；优先级为 `--repo` > origin remote > repo.json。
 
 ## 四、失败速查
 

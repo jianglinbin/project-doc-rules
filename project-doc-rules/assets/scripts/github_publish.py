@@ -230,10 +230,12 @@ def cmd_push(args) -> None:
     tok = token_load()
     root = require_repo()
     dirty_check(root, args.allow_dirty)
-    # 开发侧工具文件约定：.gitignore 不上公开仓（自排除 + 移出索引）。被跟踪则提示。
-    if (root / ".gitignore").is_file() and git("ls-files", "--", ".gitignore", cwd=root):
-        log("提示：.gitignore 已被跟踪——公开仓惯例是移出："
-            "把 '.gitignore' 写进 .gitignore 自身，git rm --cached .gitignore 后提交")
+    # 开发侧文件约定：.gitignore、AGENTS.md、ledger/ 默认不上公开仓。被跟踪则提示。
+    for dev in (".gitignore", "AGENTS.md"):
+        if (root / dev).is_file() and git("ls-files", "--", dev, cwd=root):
+            log(f"提示：{dev} 已被跟踪——公开仓惯例是移出（git rm --cached {dev} 后提交）")
+    if (root / "ledger").is_dir() and git("ls-files", "--", "ledger", cwd=root):
+        log("提示：ledger/ 已被跟踪——台账属开发过程文档，公开仓惯例是移出（git rm -r --cached ledger 后提交）")
     owner, name = ensure_repo_info(tok, *([None, None] if not args.repo else args.repo.split("/", 1)))
     branch = args.branch or git("rev-parse", "--abbrev-ref", "HEAD", cwd=root)
     if branch == "HEAD":
