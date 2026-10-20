@@ -1,0 +1,66 @@
+name: release-skill
+
+# 把 project-doc-rules/ 技能包打成 zip：
+# - 手动触发：只构建 + 上传 Actions artifact（用于验证）。
+# - 推 tag v*：挂 GitHub Release（zip + SHA256SUMS）。
+on:
+  workflow_dispatch:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-skill-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Package skill
+        shell: bash
+        run: |
+          case "$GITHUB_REF_NAME" in
+            v[0-9]*.[0-9]*.[0-9]*) ;;
+            *) echo "::error::tag 必须是 vX.Y.Z 形态：$GITHUB_REF_NAME"; exit 1 ;;
+          esac
+          VERSION="${GITHUB_REF_NAME#v}"
+          # 内容断言：技能包关键文件齐备
+          for f in project-doc-rules/SKILL.md \
+                   project-doc-rules/assets/scripts/ledger_check.py \
+                   project-doc-rules/assets/scripts/github_publish.py; do
+            [ -f "$f" ] || { echo "::error::缺 $f"; exit 1; }
+          done
+          # checkout 只含被跟踪文件：开发文档（规划稿/审查报告/.gitignore）天然不进包
+          ZIP="project-doc-rules-${VERSION}-skill.zip"
+          zip -qr "$ZIP" project-doc-rules
+          # 结构断言：顶层目录名在，解压不散落
+          unzip -l "$ZIP" | grep -q "project-doc-rules/SKILL.md" \
+            || { echo "::error::zip 内缺少 project-doc-rules/SKILL.md"; exit 1; }
+          echo "ZIP=$ZIP" >> "$GITHUB_ENV"
+
+      - name: SHA256
+        run: |
+          sha256sum "$ZIP" > SHA256SUMS.txt
+          cat SHA256SUMS.txt
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: skill-zip
+          path: |
+            ${{ env.ZIP }}
+            SHA256SUMS.txt
+          if-no-files-found: error
+
+      - name: Publish Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            ${{ env.ZIP }}
+            SHA256SUMS.txt
