@@ -242,10 +242,26 @@ def cmd_push(args) -> None:
         die("当前处于 detached HEAD，用 --branch 指定目标分支")
     url = remote_url(owner, name, tok)
     env = dict(os.environ, GIT_TERMINAL_PROMPT="0")
-    log(f"推送 {branch} → {owner}/{name}" + ("（含全部 tag）" if args.tags else ""))
+    # tag 策略：--tags 只推版本 tag（v*）；rb/* 等回退标记属开发过程产物，永不推送
+    new_vtags: list[str] = []
+    if args.tags:
+        all_tags = sorted(git("tag", "-l", cwd=root).split())
+        vtags = [t for t in all_tags if t.startswith("v")]
+        others = [t for t in all_tags if t not in vtags]
+        if others:
+            log("提示：本地非版本 tag 不推送（回退标记等属开发过程产物）："
+                + ", ".join(others[:8]) + ("…" if len(others) > 8 else ""))
+        r0 = subprocess.run(["git", "ls-remote", "--tags", url], cwd=root,
+                            capture_output=True, text=True, encoding="utf-8",
+                            errors="replace", env=env)
+        remote_tags = {ln.split()[-1][len("refs/tags/"):] for ln in (r0.stdout or "").splitlines()
+                       if ln.split() and ln.split()[-1].startswith("refs/tags/")}
+        new_vtags = [t for t in vtags if t not in remote_tags]
+    log(f"推送 {branch} → {owner}/{name}"
+        + (f"（版本 tag 新增：{', '.join(new_vtags) or '无'}；rb/* 等回退标记不推）" if args.tags else ""))
     cmd = ["git", "push", url, f"{branch}:{branch}"]
     if args.tags:
-        cmd.append("--tags")
+        cmd.append("refs/tags/v*:refs/tags/v*")
     r = subprocess.run(cmd, cwd=root, capture_output=True, text=True,
                        encoding="utf-8", errors="replace", env=env)
     out = redact((r.stderr or "") + (r.stdout or ""), tok)
@@ -258,6 +274,26 @@ def cmd_push(args) -> None:
         git("remote", "add", "origin", f"https://github.com/{owner}/{name}.git", cwd=root)
         log("已设置 origin（无凭据 URL，日常 fetch/pull 走它）")
     log(f"推送完成：https://github.com/{owner}/{name}/tree/{branch}")
+    # tag 事件核验：tag 与分支捆绑推送时 GitHub 偶发不触发 CI，逐个确认
+    if args.tags and new_vtags:
+        wf_dir = root / ".github" / "workflows"
+        has_wf = wf_dir.is_dir() and any(wf_dir.glob("*.y*ml"))
+        if has_wf:
+            log(f"核验 tag 触发的 CI 运行（{', '.join(new_vtags)}）…")
+            deadline = time.time() + 60
+            pending = list(new_vtags)
+            while pending and time.time() < deadline:
+                runs = api_or_die("GET", f"/repos/{owner}/{name}/actions/runs?event=push&per_page=30",
+                                  tok).get("workflow_runs", [])
+                seen = {r.get("head_branch") for r in runs}
+                pending = [t for t in pending if t not in seen]
+                if pending:
+                    time.sleep(10)
+            if pending:
+                die("tag 事件未触发 CI（与分支捆绑推送偶发）。单独重推：\n"
+                    + "\n".join(f"  git push origin :refs/tags/{t} && git push origin {t}"
+                                for t in pending))
+            log("tag CI 触发核验通过")
 
 
 def _workflow_name(root: Path, args) -> str:

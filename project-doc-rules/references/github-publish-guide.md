@@ -46,6 +46,9 @@ python tools/github_publish.py publish --private --tags --watch   # 全流程一
    推完会补一个无凭据的 origin 供日常 fetch/pull。
 4. **CI 触发两型**：`workflow_dispatch` 型用 `ci trigger`；`push tags` 型用 `push --tags`。
    本地只有一个 workflow 文件时 `publish` 子命令会自动识别并等待结论。
+   `push --tags` **只推 `v*` 版本 tag**（rb/* 等回退标记属开发过程产物，永不外推）；
+   推送后自动轮询核验各新 tag 的 CI 运行是否触发——tag 与分支捆绑推送偶发丢事件，
+   未触发时工具会报错并给出单独重推指令。
 5. **目标仓库记忆**：`repo create` / 成功推送后把 `owner/name` 记在配置目录
    （repo.json），后续命令不必重复指定；优先级为 `--repo` > origin remote > repo.json。
 
@@ -81,6 +84,7 @@ python tools/github_publish.py publish --private --tags --watch   # 全流程一
 | 推送被拒 non-fast-forward | 远端有本地没有的提交 → 先 `git pull --rebase`，**禁 --force** |
 | `触发失败 HTTP 422` | workflow 缺 `on: workflow_dispatch`，或该文件只在非默认分支 → 改走 tag 触发 |
 | `ci status` 长时间 queued | runner 排队，属 GitHub 侧状态，非脚本问题；超时后重查即可 |
+| 提示「tag 事件未触发 CI」 | tag 与分支捆绑推送偶发丢事件 → 按提示单独重推该 tag（删远程 tag 后再 push） |
 
 ## 六、CI 模板：tag 挂 Release（可选出口）
 
