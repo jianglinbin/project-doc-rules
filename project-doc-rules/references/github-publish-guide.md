@@ -34,9 +34,9 @@ python tools/github_publish.py publish --private --tags --watch   # 全流程一
 
 ## 三、行为约定（与仓库制度衔接）
 
-1. **先提交再推送，推送需明确授权**：脚本遇脏工作区直接拒绝——这是把 AGENTS.md「先提交本地库，再推送」
-   的顺序铁律做成了机器门槛，不要用 `--allow-dirty` 绕过。**推送本身需用户当次明确授权**
-   （基础规则 10）：不得「顺手推送」，push 远程、远程 tag、Release 同理。
+1. **先提交再推送，推送由用户主动要求**：脚本遇脏工作区直接拒绝——这是把 AGENTS.md「先提交本地库，再推送」
+   的顺序铁律做成了机器门槛，不要用 `--allow-dirty` 绕过。**推送由用户主动发起**（基础规则 10）：
+   Agent 不推送、也不主动询问是否推送；push 远程、远程 tag、Release 只在用户明确说「推 / 发布」时执行。
 2. **开发侧文件不上公开仓**（沿 d372 决议）：`.gitignore` / `.clang-format` /
    `.gitattributes`，以及**规则层与台账（`AGENTS.md`、`ledger/`）**——它们是开发过程
    产物，公开仓只放对外交付物。`.gitignore` 的自排除做法：把 `.gitignore` 一行写进
