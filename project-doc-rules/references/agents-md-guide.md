@@ -77,7 +77,7 @@
 （线程、平台、命名、产物……每条一小节，来自访谈 5）
 
 ## N-2. 文档与命名
-- 规格是唯一开工依据；先改规格再改代码。
+- 规格是唯一开工依据（变更顺序见 §0「规格先行」，此处不重复）。
 - {{full 档加：规格模板见 docs/SPEC_TEMPLATE.md}}。
 - {{命名约定：目录/文件、类型、函数}}。
 
@@ -88,7 +88,7 @@
 
 ## N. 版本与发布（仅当项目采用本技能发布出口时保留本节）
 - 版本号唯一真值：{{VERSION_SOURCE，如 CMakeLists project(VERSION) / package.json / git tag}}；改版本 = 开新版本台账 + 打 tag v*。
-- 发布：`python tools/github_publish.py push --tags`（tag v* 触发 CI 挂 Release，模板 release-zip.yml.tpl）。
+- 发布：`python tools/github_publish.py push --tags`（仅用户明确要求时执行，见 §0 基础规则；tag v* 触发 CI 挂 Release，模板 release-zip.yml.tpl）。
 - 顺序铁律：先提交本地库，再推送 GitHub（发布脚本对脏工作区直接拒绝）。
 
 ## N+1. 开发循环铁律

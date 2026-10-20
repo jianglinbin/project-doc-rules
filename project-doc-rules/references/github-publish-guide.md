@@ -37,7 +37,7 @@ python tools/github_publish.py publish --private --tags --watch   # 全流程一
 1. **先提交再推送，推送由用户主动要求**：脚本遇脏工作区直接拒绝——这是把 AGENTS.md「先提交本地库，再推送」
    的顺序铁律做成了机器门槛，不要用 `--allow-dirty` 绕过。**推送由用户主动发起**（基础规则 10）：
    Agent 不推送、也不主动询问是否推送；push 远程、远程 tag、Release 只在用户明确说「推 / 发布」时执行。
-2. **开发侧文件不上公开仓**（沿 d372 决议）：`.gitignore` / `.clang-format` /
+2. **开发侧文件不上公开仓**：`.gitignore` / `.clang-format` /
    `.gitattributes`，以及**规则层与台账（`AGENTS.md`、`ledger/`）**——它们是开发过程
    产物，公开仓只放对外交付物。`.gitignore` 的自排除做法：把 `.gitignore` 一行写进
    `.gitignore` 本身（忽略规则对未跟踪文件依然生效），再 `git rm --cached` 移出索引
@@ -88,6 +88,6 @@ python tools/github_publish.py publish --private --tags --watch   # 全流程一
 复制为项目 `.github/workflows/release.yml`，替换三处占位符：`{{PKG_DIR}}` 打包目录、
 `{{PKG_NAME}}` 产物名前缀、关键文件断言列表按项目实际改（至少一条）。
 
-约定与 FlashRec 同构：**手动触发只出 artifact（验证）；tag `vX.Y.Z` 挂 Release**
+触发约定：**手动触发只出 artifact（验证）；tag `vX.Y.Z` 挂 Release**
 （zip + SHA256SUMS.txt）。发布全流程：commit → `push` → `git tag vX.Y.Z` →
 `push --tags` → `ci status --watch` 盯结论。

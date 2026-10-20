@@ -41,7 +41,7 @@ description: 为项目建立「规则-规格-决议」三层文档体系。触�
 
 ## 发布出口（可选，用户要求「推 GitHub / 触发 CI」时进入）
 
-复制 `assets/scripts/github_publish.py` 到项目 `tools/` 后按指南操作（token 允许脚本加密或明文保存，政策见该文件）：读 `references/github-publish-guide.md` → token set → repo create → push --tags → ci trigger/status。
+复制 `assets/scripts/github_publish.py` 到项目 `tools/` 后按指南操作（token 允许脚本加密或明文保存，政策见该文件；推送动作仅在用户明确提出时执行，见指南 §三）：读 `references/github-publish-guide.md` → token set → repo create → push --tags → ci trigger/status。
 
 ## 档位速判（进入阶段 0 前的粗筛，最终以 reference 为准）
 
