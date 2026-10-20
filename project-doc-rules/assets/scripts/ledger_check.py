@@ -8,6 +8,8 @@
   4. 条目标题行须为「### dN · 标题」（· 为唯一合法分隔符，格式即契约）
   5. 已归档编号区间豁免：ledger/archives.json（可选）登记的区间在主线
      ledger/ 缺席属预期，不判损坏、只提示；与主线已有条目重叠时提示核对
+  6. 软提示（不判损坏）：单条目 >15 行（制度上限 10 行，细节应移规格/规则文档）、
+     INDEX 状态描述 >100 字符（应为一句话版本主题）
 
 archives.json 格式（无归档历史可不建该文件）：
     [{"lo": 10, "hi": 20, "branch": "archive/some-line"}]
@@ -100,13 +102,21 @@ def main() -> int:
     per_file: dict[str, list[int]] = {}
     owners: dict[int, list[str]] = {}
 
+    long_entries: list[str] = []
     for f in files:
         nums: list[int] = []
-        for line in f.read_text(encoding="utf-8").splitlines():
+        starts: list[int] = []
+        lines = f.read_text(encoding="utf-8").splitlines()
+        for i, line in enumerate(lines):
             m = ENTRY_RE.match(line.strip())
             if m:
                 nums.append(int(m.group(1)))
+                starts.append(i)
         per_file[f.name] = nums
+        for k, s in enumerate(starts):  # 软提示：条目超长（制度 ≤10 行）
+            e = starts[k + 1] if k + 1 < len(starts) else len(lines)
+            if e - s > 15:
+                long_entries.append(f"{f.name} d{nums[k]} 占 {e - s} 行")
         if not nums:
             problems.append(f"{f.name}：未解析到条目（标题行须为 '### dN · 标题'）")
         for a, b in zip(nums, nums[1:]):
@@ -148,7 +158,10 @@ def main() -> int:
 
     rows, idx_problems = parse_index()
     problems.extend(idx_problems)
-    for ver, fn, lo, hi, count, _status in rows:
+    long_status: list[str] = []
+    for ver, fn, lo, hi, count, status in rows:
+        if len(status) > 100:  # 软提示：INDEX 状态描述应为一句话版本主题
+            long_status.append(f"{ver}（{len(status)} 字符）")
         if fn not in per_file:
             problems.append(f"INDEX.md：{ver} 指向的 '{fn}' 不存在于 ledger/")
             continue
@@ -169,6 +182,14 @@ def main() -> int:
     print("=" * 56)
     print(f" {PROJECT_NAME} 台账校验")
     print("=" * 56)
+    if long_entries:
+        detail = "；".join(long_entries[:5]) + (f" 等 {len(long_entries)} 条" if len(long_entries) > 5 else "")
+        notes.append(f"条目超长（>15 行，制度上限 10 行）：{detail}——细节应移规格/规则文档")
+    if long_status:
+        notes.append(
+            f"INDEX 状态描述超长（应为一句话主题）：{len(long_status)} 行——"
+            + "；".join(long_status[:4]) + (" 等" if len(long_status) > 4 else "")
+        )
     for n in notes:
         print(f"  [OK]   {n}")
     if problems:
