@@ -174,13 +174,24 @@ def repo_info_save(owner: str, name: str, url: str) -> None:
 
 
 def ensure_repo_info(tok: str, owner: str | None, name: str | None) -> tuple[str, str]:
-    info = repo_info_load()
-    o = owner or (info or {}).get("owner")
-    n = name or (info or {}).get("name")
-    if not (o and n):
+    if not (owner and name):
+        # 优先从 origin remote 推导（无凭据 URL）——repo.json 是用户级全局记录，
+        # 多项目共用时会串仓号，故只作兜底
+        r = subprocess.run(["git", "remote", "get-url", "origin"],
+                           capture_output=True, text=True, encoding="utf-8")
+        if r.returncode == 0:
+            m = re.search(r"github\.com[:/](.+?)/(.+?)(?:\.git)?/?$", r.stdout.strip())
+            if m:
+                owner, name = owner or m.group(1), name or m.group(2)
+    if not (owner and name):
+        info = repo_info_load()
+        o = (info or {}).get("owner")
+        n = (info or {}).get("name")
+        owner, name = owner or o, name or n
+    if not (owner and name):
         die("不知道目标仓库：用 `repo create NAME` 建仓，或 `--repo OWNER/NAME` 指定")
-    repo_info_save(o, n, f"https://github.com/{o}/{n}")
-    return o, n
+    repo_info_save(owner, name, f"https://github.com/{owner}/{name}")
+    return owner, name
 
 
 # ---------------------------------------------------------------- 子命令实现
@@ -308,9 +319,7 @@ def cmd_publish(args) -> None:
     code, _ = api("GET", f"/repos/{owner}/{name}", tok)
     if code == 404:
         log(f"远端无 {owner}/{name}，自动建仓…")
-        ns = argparse.Namespace(name=name, private=args.private, desc=None)
-        repo_info_load() and repo_info_save(owner, name, "")  # 保留已知 owner
-        cmd_repo_create(ns)
+        cmd_repo_create(argparse.Namespace(name=name, private=args.private, desc=None))
     cmd_push(argparse.Namespace(repo=f"{owner}/{name}", tags=args.tags,
                                 allow_dirty=args.allow_dirty, branch=None))
     wf_dir = root / ".github" / "workflows"
