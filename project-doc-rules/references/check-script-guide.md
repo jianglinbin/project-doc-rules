@@ -18,7 +18,7 @@
 1. 编号 `dN` 全局连续：d1 起无断号、无重号（归档区间豁免）。
 2. 单本台账内部编号连续。
 3. `INDEX.md` 每个版本的编号区间、条数与账本实际条目一致；指向文件存在。
-4. 条目标题行可解析（`### dN · 标题`），解析不到条目的账本报警。
+4. 条目为管道表行（`| dN | … |`，固定 8 列），单元格内出现竖线或列数不符即判损坏；解析不到条目的账本报警。
 
 退出码：0 = 通过；1 = 台账损坏。损坏必须先修复再提交——这是硬门槛。
 
@@ -31,19 +31,9 @@
 
 ## 四、dogfooding：为本次建档记台账 d1
 
-在建档工作全部落盘后，往 `ledger/v{version}.md` 追加首条：
+在建档工作全部落盘后，往 `ledger/v{version}.md` 的表格末尾追加首行（一条决议一行，八列）：
 
-```markdown
-### d1 · 建立「规则-规格-决议」三层文档体系
-- 日期：{{date}}
-- 类型：制度
-- 决议：采纳三层体系（AGENTS.md 规则层 / 规格文档规范 / ledger 版本台账 + ledger_check.py 校验），
-  由 project-doc-rules skill 生成。
-- 依据：AGENTS.md 全文
-- 改动：AGENTS.md、ledger/、tools/ledger_check.py
-- 验证：python tools/ledger_check.py 退出码 0
-- 关联：无
-```
+| d1 | {{date}} | 制度 | 建立「规则-规格-决议」三层文档体系（skill 生成） | AGENTS.md 全文 | AGENTS.md、ledger/、tools/ledger_check.py | 校验脚本退出码 0 | — |
 
 随后再跑一次校验，确认 d1 被正确解析、INDEX 区间与条数一致（INDEX 模板初始行为 `v{version} | v{version}.md | d1 – d1 | … | 1 | 进行中`，与实际不符就按实际填）。
 

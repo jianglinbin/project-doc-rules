@@ -5,10 +5,11 @@
   1. 编号 dN 全局连续（d1..dN），不跳号、不重号
   2. 单本台账内部编号连续
   3. INDEX.md 中每个版本的编号区间与条数，与实际条目一致
-  4. 条目标题行须为「### dN · 标题」（· 为唯一合法分隔符，格式即契约）
+  4. 条目为管道表行「| dN | 日期 | 类型 | 决议 | 依据 | 改动 | 验证 | 关联 |」
+     （固定 8 列，格式即契约；单元格内出现竖线 → 列数 != 8 → 判损坏）
   5. 已归档编号区间豁免：ledger/archives.json（可选）登记的区间在主线
      ledger/ 缺席属预期，不判损坏、只提示；与主线已有条目重叠时提示核对
-  6. 软提示（不判损坏）：单条目 >15 行（制度上限 10 行，细节应移规格/规则文档）、
+  6. 软提示（不判损坏）：决议单元格 >200 字符（应为一句话结论，细节移规格/规则文档）、
      INDEX 状态描述 >100 字符（应为一句话版本主题）
 
 archives.json 格式（无归档历史可不建该文件）：
@@ -33,7 +34,7 @@ INDEX = LEDGER_DIR / "INDEX.md"
 ARCHIVES_JSON = LEDGER_DIR / "archives.json"
 SKIP = {"LEDGER_RULES.md", "INDEX.md"}
 
-ENTRY_RE = re.compile(r"^###\s+d(\d+)\s*·")
+ENTRY_RE = re.compile(r"^\|\s*d(\d+)\s*\|")
 VER_RE = re.compile(r"^v[\w.\-]+$")
 RANGE_RE = re.compile(r"^d(\d+)\s*[–\-~至]\s*d(\d+)$")
 
@@ -102,23 +103,30 @@ def main() -> int:
     per_file: dict[str, list[int]] = {}
     owners: dict[int, list[str]] = {}
 
-    long_entries: list[str] = []
+    verbose_rows: list[str] = []
     for f in files:
         nums: list[int] = []
-        starts: list[int] = []
         lines = f.read_text(encoding="utf-8").splitlines()
-        for i, line in enumerate(lines):
+        for line in lines:
             m = ENTRY_RE.match(line.strip())
-            if m:
-                nums.append(int(m.group(1)))
-                starts.append(i)
+            if not m:
+                continue
+            n = int(m.group(1))
+            nums.append(n)
+            cells = [c.strip() for c in line.strip().strip("|").split("|")]
+            if len(cells) != 8:
+                problems.append(
+                    f"{f.name}：d{n} 行为 {len(cells)} 列（应为 8 列："
+                    "编号/日期/类型/决议/依据/改动/验证/关联；单元格内禁用竖线）"
+                )
+            elif len(cells[3]) > 200:  # 软提示：决议应为一句话结论
+                verbose_rows.append(f"{f.name} d{n} 决议 {len(cells[3])} 字符")
         per_file[f.name] = nums
-        for k, s in enumerate(starts):  # 软提示：条目超长（制度 ≤10 行）
-            e = starts[k + 1] if k + 1 < len(starts) else len(lines)
-            if e - s > 15:
-                long_entries.append(f"{f.name} d{nums[k]} 占 {e - s} 行")
         if not nums:
-            problems.append(f"{f.name}：未解析到条目（标题行须为 '### dN · 标题'）")
+            problems.append(
+                f"{f.name}：未解析到条目（条目行须为 "
+                "'| dN | 日期 | 类型 | 决议 | 依据 | 改动 | 验证 | 关联 |'）"
+            )
         for a, b in zip(nums, nums[1:]):
             if b != a + 1:
                 problems.append(f"{f.name}：本台账内编号不连续，d{a} 之后直接跳到 d{b}")
@@ -182,9 +190,9 @@ def main() -> int:
     print("=" * 56)
     print(f" {PROJECT_NAME} 台账校验")
     print("=" * 56)
-    if long_entries:
-        detail = "；".join(long_entries[:5]) + (f" 等 {len(long_entries)} 条" if len(long_entries) > 5 else "")
-        notes.append(f"条目超长（>15 行，制度上限 10 行）：{detail}——细节应移规格/规则文档")
+    if verbose_rows:
+        detail = "；".join(verbose_rows[:5]) + (f" 等 {len(verbose_rows)} 条" if len(verbose_rows) > 5 else "")
+        notes.append(f"决议单元格超长（>200 字符，应为一句话结论）：{detail}——细节应移规格/规则文档")
     if long_status:
         notes.append(
             f"INDEX 状态描述超长（应为一句话主题）：{len(long_status)} 行——"
