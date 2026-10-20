@@ -1,6 +1,6 @@
 ---
 name: project-doc-rules
-description: 为项目建立「规则-规格-决议」三层文档体系。触发词：项目规则、AGENTS.md、文档规范、项目文档制度、台账、决议记录、建立文档体系、ledger。生成 AGENTS.md（Agent 行为规则）、规格文档规范、版本台账（ledger/）与校验脚本。适用于新项目建档或既有项目补建/整顿文档体系。
+description: 为项目建立「规则-规格-决议」三层文档体系。触发词：初始化项目、项目初始化、项目规则、AGENTS.md、文档规范、项目文档制度、台账、决议记录、建立文档体系、ledger。生成 AGENTS.md（Agent 行为规则）、规格文档规范、版本台账（ledger/）与校验脚本。适用于新项目建档或既有项目补建/整顿文档体系。
 ---
 
 # project-doc-rules — 项目文档规则体系建立
