@@ -55,7 +55,12 @@
 - 动手前 `python tools/ledger_check.py` 确认下一个可用编号；收尾必跑，退出码非 0 先修复再提交。
 - 制度详见 ledger/README.md。
 
-## N. 开发循环铁律
+## N. 版本与发布（仅当项目采用本技能发布出口时保留本节）
+- 版本号唯一真值：{{VERSION_SOURCE，如 CMakeLists project(VERSION) / package.json / git tag}}；改版本 = 开新版本台账 + 打 tag v*。
+- 发布：`python tools/github_publish.py push --tags`（tag v* 触发 CI 挂 Release，模板 release-zip.yml.tpl）。
+- 顺序铁律：先提交本地库，再推送 GitHub（发布脚本对脏工作区直接拒绝）。
+
+## N+1. 开发循环铁律
 （来自访谈 7，含编译门槛、冒烟约定）
 ```
 
@@ -66,6 +71,6 @@
 | 引言 + 目录树 | ~20 |
 | 目录职责表 | 30–50 |
 | 纪律条款（4–8 条） | 40–60 |
-| 台账 + 发布/循环铁律 | 20–30 |
+| 台账 + 版本发布 + 循环铁律 | 20–30 |
 
 生成后自检：逐条问「这条能否直接照做、能否机器或人工验证」；不能的改写或删除。写盘后进入阶段 2。
