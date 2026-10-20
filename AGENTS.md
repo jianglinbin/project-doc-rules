@@ -12,7 +12,8 @@
 | `project-doc-rules/assets/scripts/` | 随技能分发的 Python 工具 | 一次性本地脚本 |
 | `project-doc-rules/assets/templates/` | 可复制落盘的模板（`.tpl`，占位符 `{{...}}`） | 已实例化的项目文件 |
 | `.github/workflows/` | CI：release.yml（tag v* 挂 Release） | 其他无关 workflow |
-| `ledger/`、`tools/`、`AGENTS.md` | 仓库自身档案：版本台账、校验脚本、本文件 | 技能包内容（那属于 project-doc-rules/） |
+| `tools/`、`AGENTS.md` | 仓库自身档案：校验/发布脚本、本文件 | 技能包内容（那属于 project-doc-rules/） |
+| `ledger/` | 本仓台账——**开发过程文档，仅存本地**（gitignore，同 FlashRec 私有仓口径，d5） | —— 永不提交 |
 | `.workbuddy/` | 本地工作区数据（记忆/日志），gitignore | —— 永不提交 |
 | 根目录 `*-plan.md` / `*-review.md` | 开发规划与审查文档，gitignore | —— 不上公开仓 |
 
