@@ -18,5 +18,5 @@
 - 验证：怎么确认它真的生效了
 - 关联：dN / 无
 
-（示例格式同时见 ledger/README.md §五）
+（示例格式同时见 ledger/LEDGER_RULES.md §五）
 -->

@@ -31,7 +31,7 @@ ROOT = Path(__file__).resolve().parent.parent
 LEDGER_DIR = ROOT / "ledger"
 INDEX = LEDGER_DIR / "INDEX.md"
 ARCHIVES_JSON = LEDGER_DIR / "archives.json"
-SKIP = {"README.md", "INDEX.md"}
+SKIP = {"LEDGER_RULES.md", "INDEX.md"}
 
 ENTRY_RE = re.compile(r"^###\s+d(\d+)\s*·")
 VER_RE = re.compile(r"^v[\w.\-]+$")

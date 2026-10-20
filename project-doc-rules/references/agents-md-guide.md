@@ -84,7 +84,7 @@
 ## N-1. 版本台账（ledger/）
 - 一版本一本账，一条决议一条记录；编号 dN 全局连续、只追加。
 - 动手前 `python tools/ledger_check.py` 确认下一个可用编号；收尾必跑，退出码非 0 先修复再提交。
-- 制度详见 ledger/README.md。
+- 制度详见 ledger/LEDGER_RULES.md。
 
 ## N. 版本与发布（仅当项目采用本技能发布出口时保留本节）
 - 版本号唯一真值：{{VERSION_SOURCE，如 CMakeLists project(VERSION) / package.json / git tag}}；改版本 = 开新版本台账 + 打 tag v*。

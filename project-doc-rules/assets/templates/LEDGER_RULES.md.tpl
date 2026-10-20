@@ -68,7 +68,7 @@
 
 | 文件 | 作用 |
 |---|---|
-| `README.md` | 本文件：{{PROJECT_NAME}} 台账制度 |
+| `LEDGER_RULES.md` | 本文件：{{PROJECT_NAME}} 台账制度 |
 | `INDEX.md` | 版本索引 —— **agent 的唯一入口** |
 | `vX.Y.Z.md` | 版本台账正文 |
 | `../tools/ledger_check.py` | 断号校验脚本 |
