@@ -1,0 +1,41 @@
+# 阶段 3：台账层（ledger/）初始化指南
+
+> 产出：`ledger/README.md`、`ledger/INDEX.md`、`ledger/v{version}.md`。
+> 前两份从 `assets/templates/` **复制后替换占位符**，不要重写；本文件只讲制度要点与替换清单。
+
+## 一、复制与替换
+
+| 模板 | 落盘为 | 替换项 |
+|---|---|---|
+| `assets/templates/ledger-README.md.tpl` | `ledger/README.md` | `{{PROJECT_NAME}}` |
+| `assets/templates/ledger-INDEX.md.tpl` | `ledger/INDEX.md` | `{{PROJECT_NAME}}` |
+| `assets/templates/ledger-entry.md.tpl` | `ledger/v{version}.md` | `{{VERSION}}`、`{{DATE}}`、`{{CARRY_OVER}}`（承接编号，首版为 0，即从 d1 起） |
+
+若已有历史版本需要追溯，可按 INDEX 表格式为每个历史版本补一行（文件可缺，区间写实际已知范围并注明「追溯」）。
+
+## 二、制度要点（README 模板即制度全文，不在此复述、不落盘）
+
+只强调 README 之外的两点：
+- **标题行 `### dN · 标题` 是机器解析契约**：其他分隔符或写法会漏检，账本会被判损坏；字段写法照模板，不自创。
+- **防口径漂移**：编号铁律、记账时机、状态机等制度以 README 为唯一文本源，禁止在 AGENTS.md 或其他文件复述（AGENTS.md 只放两三行引用条款）。
+
+## 三、当前版本账本头部
+
+`v{version}.md` 按模板生成后，头部字段：
+
+```
+版本：{{version}}
+开账日期：{{date}}
+承接编号：{{carry_over}}（首版写 0，下一条从 d1 起）
+状态：进行中
+```
+
+正文按 `ledger-entry.md.tpl` 的条目格式追加。
+
+## 四、与 AGENTS.md 的接口
+
+阶段 1 生成的 AGENTS.md 已含「版本台账」条款（动手前查号 / 收尾跑校验 / 制度见 README）。若当时该条款是 TODO 占位，现在回填为正式条款（引用 `ledger/README.md`，两三行即可，不复述制度）。
+
+> 注：本阶段落盘后账本尚无条目，此时跑校验报「未解析到条目」属预期，d1 于阶段 4 记入后自然消除。
+
+写盘后进入阶段 4（`check-script-guide.md`）。

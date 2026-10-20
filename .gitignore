@@ -1,0 +1,6 @@
+# 开发相关文档：只留本地，不进公开仓
+project-doc-rules-skill-plan.md
+project-doc-rules-review.md
+
+# 工作区数据（含记忆/日志）
+.workbuddy/
