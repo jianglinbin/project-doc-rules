@@ -48,7 +48,30 @@ python tools/github_publish.py publish --private --tags --watch   # 全流程一
 5. **目标仓库记忆**：`repo create` / 成功推送后把 `owner/name` 记在配置目录
    （repo.json），后续命令不必重复指定；优先级为 `--repo` > origin remote > repo.json。
 
-## 四、失败速查
+## 四、上传判定标准（什么进公开仓，什么留本地）
+
+对每个准备提交的文件/目录，**按顺序问四个问题**：
+
+1. **是对外交付物吗？**——删掉它，仓库的使用者/协作者会受影响吗？
+   受影响（源码、技能包、构建/打包脚本、CI 配置、README/LICENSE）→ **上传**；不受影响 → 进入第 2 问。
+2. **是开发过程产物吗？**——只为「开发/维护本仓」服务的 → **留本地**（gitignore + `git rm --cached`）：
+   规则层与台账（`AGENTS.md`、`ledger/`）、维护工具实例（`tools/` 里技能 assets 已有原件的脚本）、
+   规划/审查/会议文档、工作记忆与日志。
+3. **含凭据或私有信息吗？**——token、内网 IP、本机用户路径、密钥。无论第 1 问答案如何，
+   必须先脱敏或不上传；拿不准就跑残留扫描（正则扫内网段 / 用户名 / `token` 字样）。
+4. **仍拿不准？**——**默认不上传**（保守侧），向用户确认；确认结果记台账。
+
+默认清单（多数项目直接套用）：
+
+| 上传 | 留本地 |
+|---|---|
+| 对外交付物目录（如技能包、`src/`） | `AGENTS.md`、`ledger/`、`tools/` 维护脚本实例 |
+| `.github/workflows/`（CI 是交付物的一部分） | 规划/审查文档、`.workbuddy/`、凭据文件 |
+| `README.md` / `LICENSE`（若项目设有） | `.gitignore` 自身（自排除） |
+
+**反例信号**（公开仓出现即违反本标准）：台账、规则层文档、规划稿、日志、任何凭据。
+
+## 五、失败速查
 
 | 症状 | 处置 |
 |---|---|
@@ -58,7 +81,7 @@ python tools/github_publish.py publish --private --tags --watch   # 全流程一
 | `触发失败 HTTP 422` | workflow 缺 `on: workflow_dispatch`，或该文件只在非默认分支 → 改走 tag 触发 |
 | `ci status` 长时间 queued | runner 排队，属 GitHub 侧状态，非脚本问题；超时后重查即可 |
 
-## 五、CI 模板：tag 挂 Release（可选出口）
+## 六、CI 模板：tag 挂 Release（可选出口）
 
 仓库有可打包产物（技能目录/文档集）时，从 `assets/templates/release-zip.yml.tpl`
 复制为项目 `.github/workflows/release.yml`，替换三处占位符：`{{PKG_DIR}}` 打包目录、
