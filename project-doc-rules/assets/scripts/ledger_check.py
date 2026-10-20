@@ -5,11 +5,12 @@
   1. 编号 dN 全局连续（d1..dN），不跳号、不重号
   2. 单本台账内部编号连续
   3. INDEX.md 中每个版本的编号区间与条数，与实际条目一致
-  4. 条目为管道表行「| dN | 日期 | 类型 | 决议 | 依据 | 改动 | 验证 | 关联 |」
-     （固定 8 列，格式即契约；单元格内出现竖线 → 列数 != 8 → 判损坏）
+  4. 条目为管道表行「| dN | 日期 | 类型 | 议题 | 决议 | 依据 | 改动 | 验证 | 关联 |」
+     （固定 9 列，格式即契约；单元格内出现竖线 → 列数 != 9 → 判损坏）
   5. 已归档编号区间豁免：ledger/archives.json（可选）登记的区间在主线
      ledger/ 缺席属预期，不判损坏、只提示；与主线已有条目重叠时提示核对
-  6. 软提示（不判损坏）：决议单元格 >200 字符（应为一句话结论，细节移规格/规则文档）、
+  6. 软提示（不判损坏）：议题单元格 >100 字符（应为一句话问题）、
+     决议单元格 >200 字符（应为一句话结论，细节移规格/规则文档）、
      INDEX 状态描述 >100 字符（应为一句话版本主题）
 
 archives.json 格式（无归档历史可不建该文件）：
@@ -114,18 +115,21 @@ def main() -> int:
             n = int(m.group(1))
             nums.append(n)
             cells = [c.strip() for c in line.strip().strip("|").split("|")]
-            if len(cells) != 8:
+            if len(cells) != 9:
                 problems.append(
-                    f"{f.name}：d{n} 行为 {len(cells)} 列（应为 8 列："
-                    "编号/日期/类型/决议/依据/改动/验证/关联；单元格内禁用竖线）"
+                    f"{f.name}：d{n} 行为 {len(cells)} 列（应为 9 列："
+                    "编号/日期/类型/议题/决议/依据/改动/验证/关联；单元格内禁用竖线）"
                 )
-            elif len(cells[3]) > 200:  # 软提示：决议应为一句话结论
-                verbose_rows.append(f"{f.name} d{n} 决议 {len(cells[3])} 字符")
+            else:
+                if len(cells[3]) > 100:  # 软提示：议题应为一句话问题
+                    verbose_rows.append(f"{f.name} d{n} 议题 {len(cells[3])} 字符")
+                if len(cells[4]) > 200:  # 软提示：决议应为一句话结论
+                    verbose_rows.append(f"{f.name} d{n} 决议 {len(cells[4])} 字符")
         per_file[f.name] = nums
         if not nums:
             problems.append(
                 f"{f.name}：未解析到条目（条目行须为 "
-                "'| dN | 日期 | 类型 | 决议 | 依据 | 改动 | 验证 | 关联 |'）"
+                "'| dN | 日期 | 类型 | 议题 | 决议 | 依据 | 改动 | 验证 | 关联 |'）"
             )
         for a, b in zip(nums, nums[1:]):
             if b != a + 1:
