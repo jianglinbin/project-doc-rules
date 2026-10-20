@@ -15,7 +15,7 @@
 环境变量 `GITHUB_TOKEN` / `GH_TOKEN` 优先于以上两者（CI 场景用）。
 
 **红线（无论哪种存储方式都不可违背）**：
-- token 永不提交进任何 git 仓库（本技能自身的 `.workbuddy/` 隔离约定同样适用）；
+- token 永不提交进任何 git 仓库（本技能自身的本地工作数据目录隔离约定同样适用）；
 - token 永不出现在日志、输出、remote URL 的持久化配置里（脚本内已打码/一次性 URL）；
 - 粘贴过 token 的会话记录视为敏感，提醒用户泄露后立即在
   GitHub → Settings → Developer settings 轮换。
@@ -67,7 +67,7 @@ python tools/github_publish.py publish --private --tags --watch   # 全流程一
 | 上传 | 留本地 |
 |---|---|
 | 对外交付物目录（如技能包、`src/`） | `AGENTS.md`、`ledger/`、`tools/` 维护脚本实例 |
-| `.github/workflows/`（CI 是交付物的一部分） | 规划/审查文档、`.workbuddy/`、凭据文件 |
+| `.github/workflows/`（CI 是交付物的一部分） | 规划/审查文档、Agent 工作区数据目录、凭据文件 |
 | `README.md` / `LICENSE`（若项目设有） | `.gitignore` 自身（自排除） |
 
 **反例信号**（公开仓出现即违反本标准）：台账、规则层文档、规划稿、日志、任何凭据。

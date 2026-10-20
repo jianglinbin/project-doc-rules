@@ -1,6 +1,6 @@
 # project-doc-rules
 
-为任意项目建立经过生产实践验证的**「规则-规格-决议」三层文档体系**的 [WorkBuddy](https://www.workbuddy.cn) 技能。适用于新项目建档，或既有项目补建/整顿文档体系。
+为任意项目建立经过生产实践验证的**「规则-规格-决议」三层文档体系**的 AI Agent 技能。适用于新项目建档，或既有项目补建/整顿文档体系。
 
 ## 三层体系
 
@@ -20,17 +20,17 @@
 
 ```bash
 # 方式一：Release zip（推荐）
-# 从 GitHub Releases 下载 project-doc-rules-<ver>-skill.zip，解压到：
-#   ~/.workbuddy/skills/project-doc-rules/
+# 从 GitHub Releases 下载 project-doc-rules-<ver>-skill.zip，解压到所用 Agent 的技能目录，
+#   例如 ~/.claude/skills/project-doc-rules/（各 Agent 的技能目录以其文档为准）
 
 # 方式二：从源码安装
 git clone https://github.com/jianglinbin/project-doc-rules
-cp -r project-doc-rules ~/.workbuddy/skills/
+cp -r project-doc-rules <你的 Agent 技能目录>/
 ```
 
 ## 使用
 
-在 WorkBuddy 对话中说任意触发词即可：**初始化项目**、项目初始化、项目规则、AGENTS.md、文档规范、台账、决议记录、建立文档体系。
+在与 AI Agent 的对话中说任意触发词即可：**初始化项目**、项目初始化、项目规则、AGENTS.md、文档规范、台账、决议记录、建立文档体系。
 
 技能按四个阶段执行（每阶段只加载一份 reference，模板一律复制不重写）：
 
