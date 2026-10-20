@@ -8,8 +8,10 @@
 | 模板 | 落盘为 | 替换项 |
 |---|---|---|
 | `assets/templates/ledger-README.md.tpl` | `ledger/README.md` | `{{PROJECT_NAME}}` |
-| `assets/templates/ledger-INDEX.md.tpl` | `ledger/INDEX.md` | `{{PROJECT_NAME}}` |
+| `assets/templates/ledger-INDEX.md.tpl` | `ledger/INDEX.md` | `{{VERSION}}`、`{{DATE}}`、主题说明占位 |
 | `assets/templates/ledger-entry.md.tpl` | `ledger/v{version}.md` | `{{VERSION}}`、`{{DATE}}`、`{{CARRY_OVER}}`（承接编号，首版为 0，即从 d1 起） |
+
+注意：INDEX/条目模板中 `{{VERSION}}` 前已有字面 `v`，**替换值不带 v 前缀**（填 `0.1.2` 而非 `v0.1.2`，否则出 `vv`）。替换后 `grep -r "{{" ledger/` 必须为 0。
 
 若已有历史版本需要追溯，可按 INDEX 表格式为每个历史版本补一行（文件可缺，区间写实际已知范围并注明「追溯」）。
 
