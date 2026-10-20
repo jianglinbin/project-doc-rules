@@ -56,3 +56,13 @@ python tools/github_publish.py publish --private --tags --watch   # 全流程一
 | 推送被拒 non-fast-forward | 远端有本地没有的提交 → 先 `git pull --rebase`，**禁 --force** |
 | `触发失败 HTTP 422` | workflow 缺 `on: workflow_dispatch`，或该文件只在非默认分支 → 改走 tag 触发 |
 | `ci status` 长时间 queued | runner 排队，属 GitHub 侧状态，非脚本问题；超时后重查即可 |
+
+## 五、CI 模板：tag 挂 Release（可选出口）
+
+仓库有可打包产物（技能目录/文档集）时，从 `assets/templates/release-zip.yml.tpl`
+复制为项目 `.github/workflows/release.yml`，替换三处占位符：`{{PKG_DIR}}` 打包目录、
+`{{PKG_NAME}}` 产物名前缀、关键文件断言列表按项目实际改（至少一条）。
+
+约定与 FlashRec 同构：**手动触发只出 artifact（验证）；tag `vX.Y.Z` 挂 Release**
+（zip + SHA256SUMS.txt）。发布全流程：commit → `push` → `git tag vX.Y.Z` →
+`push --tags` → `ci status --watch` 盯结论。
