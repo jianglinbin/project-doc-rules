@@ -12,8 +12,8 @@ description: 为项目建立「规则-规格-决议」三层文档体系。触�
 1. **按需加载**：每个阶段只读「路由表」指定的那一份 reference，读完即用，不回读已完成阶段的文件。
 2. **模板不进上下文**：台账三件套与校验脚本一律从 `assets/` 复制后做项目化替换（占位符 `{{PROJECT_NAME}}`），禁止凭记忆重写。
 3. **产出即落盘**：每阶段产物写盘后再进入下一阶段；阶段间只传递交接变量（见下）。
-4. **信息不足不中断**：访谈没答完的问题生成「TODO 标注」占位，最后统一汇总未决项告知用户。
-5. **骨架通用、血肉访谈**：台账制度照模板；目录职责表、依赖规则、铁律必须根据该项目实际情况生成，禁止硬编码套用其他项目内容。
+4. **信息不足不中断**：访谈没答完的问题生成「TODO 标注」占位，最后统一汇总未决项告知用户；TODO 是兜底不是默认，能问尽问。
+5. **骨架通用、血肉访谈**：台账制度照模板；目录职责表、依赖规则、铁律必须根据该项目实际情况生成，禁止硬编码套用其他项目内容。访谈按「设计树 + 待问边界轮询」纪律执行（`references/interview-guide.md`）。
 
 ## 交接变量（阶段间传递，保持在内存）
 
@@ -24,12 +24,12 @@ description: 为项目建立「规则-规格-决议」三层文档体系。触�
 | 阶段 | 做什么 | 读哪份 reference | 适用档位 | 产出 |
 |---|---|---|---|---|
 | **0 档位判断** | 考察项目（见下方速判），确定 `{tier}` | `references/doc-system-overview.md` | 全档 | 档位决策 + 体系蓝图（对用户简述） |
-| **1 规则层** | 访谈采集 → 生成 AGENTS.md（骨架按档位裁剪，见该文件） | `references/agents-md-guide.md` | 全档 | `AGENTS.md` |
-| **2 规格层** | full：复制规格模板落盘 + 命名条款进 AGENTS.md；lean/minimal：只把下方简版条款写进 AGENTS.md | `references/spec-guide.md`（仅 full 读） | 全档 | `docs/SPEC_TEMPLATE.md`（仅 full）+ 条款 |
+| **1 规则层** | 访谈采集 → 生成 AGENTS.md（骨架按档位裁剪，见该文件） | `references/interview-guide.md` + `references/agents-md-guide.md` | 全档 | `AGENTS.md` |
+| **2 规格层** | 生成项目方案 `docs/PROJECT_PLAN.md`（full/lean，方案轮访谈见 spec-guide §零）+ full：复制规格模板 + 命名条款进 AGENTS.md；minimal：只把下方简版条款写进 AGENTS.md | `references/spec-guide.md`（minimal 不读） | 全档 | `docs/PROJECT_PLAN.md`（full/lean）+ `docs/SPEC_TEMPLATE.md`（仅 full）+ 条款 |
 | **3 台账层** | 复制模板 → 项目化替换 → 建当前版本账本 | `references/ledger-guide.md` | full / lean | `ledger/LEDGER_RULES.md` + `INDEX.md` + `v{version}.md` |
 | **4 校验闭环** | 复制校验脚本 → 跑通 → 回写 AGENTS.md 使用条款 → 为本次建档记台账首条 | `references/check-script-guide.md` | full / lean | `tools/ledger_check.py` + 台账 d1 |
 
-**阶段 2 简版条款（lean/minimal 直接抄进 AGENTS.md，不读 spec-guide）**：
+**阶段 2 简版条款（minimal 直接抄进 AGENTS.md，不读 spec-guide；lean 抄进后另按 spec-guide §零 生成项目方案）**：
 
 ```markdown
 ## 文档与规划
@@ -53,6 +53,7 @@ description: 为项目建立「规则-规格-决议」三层文档体系。触�
 
 ```
 AGENTS.md                     # 规则层：Agent 行为唯一入口，<150 行
+docs/PROJECT_PLAN.md          # 项目方案：项目级唯一开工依据（full/lean；minimal 并入引言不落盘）
 docs/SPEC_TEMPLATE.md         # 规格模板（full 档）；*_PLAN/*_SPEC 由未来功能线按模板生成
 ledger/LEDGER_RULES.md        # 台账制度（模板复制）
 ledger/INDEX.md               # 版本索引：Agent 唯一入口（模板复制）
