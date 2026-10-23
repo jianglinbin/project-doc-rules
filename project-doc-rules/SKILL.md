@@ -25,11 +25,11 @@ description: 为项目建立「规则-规格-决议」三层文档体系。触�
 |---|---|---|---|---|
 | **0 档位判断** | 考察项目（见下方速判），确定 `{tier}` | `references/doc-system-overview.md` | 全档 | 档位决策 + 体系蓝图（对用户简述） |
 | **1 规则层** | 访谈采集 → 生成 AGENTS.md（骨架按档位裁剪，见该文件） | `references/interview-guide.md` + `references/agents-md-guide.md` | 全档 | `AGENTS.md` |
-| **2 规格层** | 方案轮 P0 先由用户决策是否生成项目方案 `docs/PROJECT_PLAN.md`（是 → P1–P3 访谈 + 落盘）+ full：复制规格模板 + 命名条款进 AGENTS.md；minimal：只把下方简版条款写进 AGENTS.md | `references/spec-guide.md`（minimal 不读） | 全档 | `docs/PROJECT_PLAN.md`（P0 用户决策生成时）+ `docs/SPEC_TEMPLATE.md`（仅 full）+ 条款 |
+| **2 规格层** | full：复制规格模板 + 命名条款进 AGENTS.md；lean/minimal：只把下方简版条款写进 AGENTS.md | `references/spec-guide.md`（仅 full 读） | 全档 | `docs/SPEC_TEMPLATE.md`（仅 full）+ 条款 |
 | **3 台账层** | 复制模板 → 项目化替换 → 建当前版本账本 | `references/ledger-guide.md` | full / lean | `ledger/LEDGER_RULES.md` + `INDEX.md` + `v{version}.md` |
 | **4 校验闭环** | 复制校验脚本 → 跑通 → 回写 AGENTS.md 使用条款 → 为本次建档记台账首条 | `references/check-script-guide.md` | full / lean | `tools/ledger_check.py` + 台账 d1 |
 
-**阶段 2 简版条款（minimal 直接抄进 AGENTS.md，不读 spec-guide；lean 抄进后另按 spec-guide §零 由用户 P0 决策是否生成项目方案）**：
+**阶段 2 简版条款（lean/minimal 直接抄进 AGENTS.md，不读 spec-guide）**：
 
 ```markdown
 ## 文档与规划
@@ -53,7 +53,6 @@ description: 为项目建立「规则-规格-决议」三层文档体系。触�
 
 ```
 AGENTS.md                     # 规则层：Agent 行为唯一入口，<150 行
-docs/PROJECT_PLAN.md          # 项目方案：项目级唯一开工依据（P0 用户决策生成；不生成则并入引言/记 TODO）
 docs/SPEC_TEMPLATE.md         # 规格模板（full 档）；*_PLAN/*_SPEC 由未来功能线按模板生成
 ledger/LEDGER_RULES.md        # 台账制度（模板复制）
 ledger/INDEX.md               # 版本索引：Agent 唯一入口（模板复制）
