@@ -28,7 +28,7 @@ import re
 import sys
 from pathlib import Path
 
-PROJECT_NAME = "PROJECT"  # 项目化：改成你的项目名（仅影响输出标题）
+PROJECT_NAME = "{{PROJECT_NAME}}"  # 项目化替换为项目名；未替换时自动回退仓库目录名（仅影响输出标题）
 
 ROOT = Path(__file__).resolve().parent.parent
 LEDGER_DIR = ROOT / "ledger"
@@ -92,6 +92,10 @@ def main() -> int:
     problems: list[str] = []
     notes: list[str] = []
     archived = load_archived_ranges()
+    title = PROJECT_NAME
+    if "{{" in PROJECT_NAME:  # 复制后未替换占位符：回退仓库目录名，只影响标题
+        title = ROOT.name
+        notes.append(f"PROJECT_NAME 占位符未替换，标题回退为仓库目录名 {ROOT.name}（不影响校验结论）")
 
     if not LEDGER_DIR.is_dir():
         print("[FAIL] 找不到 ledger/ 目录")
@@ -193,7 +197,7 @@ def main() -> int:
             )
 
     print("=" * 56)
-    print(f" {PROJECT_NAME} 台账校验")
+    print(f" {title} 台账校验")
     print("=" * 56)
     if verbose_rows:
         detail = "；".join(verbose_rows[:5]) + (f" 等 {len(verbose_rows)} 条" if len(verbose_rows) > 5 else "")

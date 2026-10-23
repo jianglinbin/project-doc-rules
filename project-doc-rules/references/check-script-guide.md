@@ -6,7 +6,7 @@
 
 从 `assets/scripts/ledger_check.py` 复制到项目 `tools/ledger_check.py`。脚本为通用实现，首次运行前只做两处项目化：
 
-1. 头部 `PROJECT_NAME` 改为 `{project_name}`（仅影响输出标题）。
+1. 头部 `PROJECT_NAME` 的占位符 `{{PROJECT_NAME}}` 替换为项目名（仅影响输出标题；未替换时脚本自动回退为仓库目录名并打印提示，不影响校验结论）。
 2. 若项目已有「编号区间随分支整体归档」的历史，在 `ledger/archives.json` 登记（文件不存在则无需创建）：
    ```json
    [{"lo": 10, "hi": 20, "branch": "archive/some-line"}]
